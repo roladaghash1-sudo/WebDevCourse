@@ -5,7 +5,7 @@
             "name": "Launch Edge against localhost",
             "type": "msedge",
             "request": "launch",
-            "url": "http://127.0.0.1:5500/index.html", // or your local dev server
+            "url": "http://127.0.0.1:5500/05_JSON/index.html/SongsListing", // or your local dev server
             "webRoot": "${workspaceFolder}"
         }
     ]
