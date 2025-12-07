@@ -86,6 +86,7 @@ function renderSongs() {
 
         <button class="btn btn-sm btn-info me-2" onclick="openModal(${song.id})">
         <i class="fas fa-eye"></i>
+        </button>
     </td>
 `;
 
@@ -161,6 +162,51 @@ document.getElementById('sort').addEventListener('change', () => {
     applySorting();
     renderSongs();
 });
+//Search
+document.getElementById('search').addEventListener('input', () => {
+    const text = document.getElementById('search').value.toLowerCase();
+
+    const filtered = songs.filter(song =>
+        song.title.toLowerCase().includes(text)
+    );
+
+    renderFiltered(filtered);
+});
+
+// Render filtered table
+function renderFiltered(filteredSongs) {
+    list.innerHTML = '';
+
+    filteredSongs.forEach(song => {
+        const thumbUrl = song.youtubeId
+            ? `https://img.youtube.com/vi/${song.youtubeId}/hqdefault.jpg`
+            : '';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${song.title}</td>
+            <td>${song.rating}</td>
+            <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
+            <td><img src="${thumbUrl}" width="120"></td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <button class="btn btn-sm btn-danger" onclick="deleteSong(${song.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+
+                <button class="btn btn-sm btn-info" onclick="openModal(${song.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+
+        list.appendChild(row);
+    });
+}
+
 // VIEW MODAL
 function openModal(id) {
     const song = songs.find(s => s.id === id);
