@@ -23,6 +23,7 @@ form.addEventListener('submit', (e) => {
             songs[index].title = title;
             songs[index].url = url;
             songs[index].rating = rating;
+            songs[index].youtubeId = getYouTubeId(url);
         }
 
     } else {
@@ -32,7 +33,8 @@ form.addEventListener('submit', (e) => {
             title,
             url,
             rating,
-            dateAdded: Date.now()
+            dateAdded: Date.now(),
+            youtubeId: getYouTubeId(url)
         };
 
         songs.push(song);
@@ -63,22 +65,28 @@ function renderSongs() {
     songs.forEach(song => {
         const row = document.createElement('tr');
 
+        const thumbUrl = song.youtubeId
+            ? `https://img.youtube.com/vi/${song.youtubeId}/hqdefault.jpg`
+            : '';
+
         row.innerHTML = `
-            <td>${song.title}</td>
-            <td>${song.rating}</td>
-            <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
-            <td class="text-end">
-                <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteSong(${song.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
+    <td>${song.title}</td>
+    <td>${song.rating}</td>
+    <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
+    <td><img src="${thumbUrl}" width="120"></td>   <!-- ⬅ תמונת יוטיוב -->
+    <td class="text-end">
+        <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSong(${song.id})">
+            <i class="fas fa-trash"></i>
+        </button>
+    </td>
+`;
 
         list.appendChild(row);
     });
+
 }
 
 //5. Delete song
@@ -104,6 +112,12 @@ function editSong(id) {
     submitBtn.classList.add('btn-warning');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+//6
+function getYouTubeId(url) {
+    const regExp = /(?:v=|youtu\.be\/)([^&]+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
 }
 
 // Initial render
