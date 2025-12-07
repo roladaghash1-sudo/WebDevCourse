@@ -75,7 +75,7 @@ function renderSongs() {
     <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
     <td><img src="${thumbUrl}" width="120"></td>
     <td class="text-end">
-    
+
         <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
             <i class="fas fa-edit"></i>
         </button>
@@ -118,14 +118,14 @@ function editSong(id) {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-//6
+//6 Extract Youtube ID
 function getYouTubeId(url) {
     const regExp = /(?:v=|youtu\.be\/)([^&]+)/;
     const match = url.match(regExp);
     return match ? match[1] : null;
 }
 
-//7
+//7 Sorting
 function applySorting() {
     const sortValue = document.getElementById('sort').value;
 
@@ -179,6 +179,71 @@ function openModal(id) {
     const modal = new bootstrap.Modal(document.getElementById('songModal'));
     modal.show();
 }
+
+//9.Card View + TOGGLE View
+//Render cards
+function renderCards() {
+    const container = document.getElementById("cardsContainer");
+    container.innerHTML = "";
+
+    songs.forEach(song => {
+        const thumbUrl = song.youtubeId
+            ? `https://img.youtube.com/vi/${song.youtubeId}/hqdefault.jpg`
+            : "";
+
+        const card = document.createElement("div");
+        card.className = "col-md-4";
+
+        card.innerHTML = `
+            <div class="card bg-dark text-white h-100">
+                <img src="${thumbUrl}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">${song.title}</h5>
+                    <p class="card-text">Rating: ${song.rating}</p>
+
+                    <a href="${song.url}" target="_blank" class="btn btn-info w-100 mb-2">
+                        <i class="fas fa-play"></i> Watch
+                    </a>
+
+                    <button class="btn btn-warning w-100 mb-2" onclick="editSong(${song.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+
+                    <button class="btn btn-danger w-100" onclick="deleteSong(${song.id})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// Toggle View
+const toggleBtn = document.getElementById("toggleView");
+const tableView = document.getElementById("tableView");
+const cardsContainer = document.getElementById("cardsContainer");
+
+toggleBtn.addEventListener("click", () => {
+    const isTable = !tableView.classList.contains("d-none");
+
+    if (isTable) {
+        // Switch to Cards
+        tableView.classList.add("d-none");
+        cardsContainer.classList.remove("d-none");
+
+        renderCards();
+        toggleBtn.textContent = "View: Table";
+    } else {
+        // Switch to Table
+        cardsContainer.classList.add("d-none");
+        tableView.classList.remove("d-none");
+
+        renderSongs();
+        toggleBtn.textContent = "View: Cards";
+    }
+});
 
 
 // Initial render
