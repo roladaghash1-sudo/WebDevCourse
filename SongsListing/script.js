@@ -2,61 +2,70 @@ const form = document.getElementById('songForm');
 const list = document.getElementById('songList');
 const submitBtn = document.getElementById('submitBtn');
 
-//if not exist in localstorage get empty array else
-//get json text and convert it to object json
+// Load songs from localStorage
 let songs = JSON.parse(localStorage.getItem('songs')) || [];
 
-//User click the Add button
+// Submit form (Add or Update song)
 form.addEventListener('submit', (e) => {
-    //Dont submit the for to the server yet let me handle it here
     e.preventDefault();
 
-    //Read Forms Data
     const title = document.getElementById('title').value;
     const url = document.getElementById('url').value;
-    const rating = Number(document.getElementById('rating').value); //3
+    const rating = Number(document.getElementById('rating').value);
+    const songId = document.getElementById('songId').value;
 
+    // UPDATE MODE
+    if (songId) {
+        const idNum = Number(songId);
+        const index = songs.findIndex(s => s.id === idNum);
 
-    //TODO validate fields
+        if (index !== -1) {
+            songs[index].title = title;
+            songs[index].url = url;
+            songs[index].rating = rating;
+        }
 
-    //create JSON Object Based on URL title
-    const song = {
-        id: Date.now(),  // Unique ID
-        title: title,
-        url: url,
-        rating: rating,
-        dateAdded: Date.now()
-    };
+    } else {
+        // ADD NEW SONG
+        const song = {
+            id: Date.now(),
+            title,
+            url,
+            rating,
+            dateAdded: Date.now()
+        };
 
+        songs.push(song);
+    }
 
-    songs.push(song);
+    // Reset form
+    form.reset();
+    document.getElementById('songId').value = '';
+
+    // Reset button
+    submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add';
+    submitBtn.classList.remove('btn-warning');
+    submitBtn.classList.add('btn-success');
 
     saveAndRender();
-
-    //TO DO SAVE  AND RERENDER 
-
-    form.reset();
 });
 
-
+// Save + render
 function saveAndRender() {
     localStorage.setItem('songs', JSON.stringify(songs));
-    //TODO RELOAD UI
     renderSongs();
 }
 
-
-
+// Render table
 function renderSongs() {
-    list.innerHTML = ''; // Clear current list
+    list.innerHTML = '';
 
     songs.forEach(song => {
-        // Create table row
         const row = document.createElement('tr');
 
         row.innerHTML = `
             <td>${song.title}</td>
-            <td>${song.rating}<td>
+            <td>${song.rating}</td>
             <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
             <td class="text-end">
                 <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
@@ -67,22 +76,35 @@ function renderSongs() {
                 </button>
             </td>
         `;
+
         list.appendChild(row);
     });
 }
 
-
-function saveAndRender() {
-    localStorage.setItem('songs', JSON.stringify(songs));
-    renderSongs(songs);
-}
-
+// Delete song
 function deleteSong(id) {
     if (confirm('Are you sure?')) {
-        // Filter out the song with the matching ID
         songs = songs.filter(song => song.id !== id);
         saveAndRender();
     }
 }
 
+// Edit song — load into form
+function editSong(id) {
+    const song = songs.find(s => s.id === id);
+    if (!song) return;
+
+    document.getElementById('title').value = song.title;
+    document.getElementById('url').value = song.url;
+    document.getElementById('rating').value = song.rating;
+    document.getElementById('songId').value = song.id;
+
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+    submitBtn.classList.remove('btn-success');
+    submitBtn.classList.add('btn-warning');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initial render
 renderSongs();
