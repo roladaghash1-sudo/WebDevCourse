@@ -73,14 +73,19 @@ function renderSongs() {
     <td>${song.title}</td>
     <td>${song.rating}</td>
     <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
-    <td><img src="${thumbUrl}" width="120"></td>   <!-- ⬅ תמונת יוטיוב -->
+    <td><img src="${thumbUrl}" width="120"></td>
     <td class="text-end">
+    
         <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
             <i class="fas fa-edit"></i>
         </button>
+
         <button class="btn btn-sm btn-danger" onclick="deleteSong(${song.id})">
             <i class="fas fa-trash"></i>
         </button>
+
+        <button class="btn btn-sm btn-info me-2" onclick="openModal(${song.id})">
+        <i class="fas fa-eye"></i>
     </td>
 `;
 
@@ -156,6 +161,25 @@ document.getElementById('sort').addEventListener('change', () => {
     applySorting();
     renderSongs();
 });
+// VIEW MODAL
+function openModal(id) {
+    const song = songs.find(s => s.id === id);
+    if (!song) return;
+
+    document.getElementById('modalTitle').textContent = song.title;
+    document.getElementById('modalRating').textContent = song.rating;
+
+    const imgUrl = song.youtubeId
+        ? `https://img.youtube.com/vi/${song.youtubeId}/hqdefault.jpg`
+        : "";
+
+    document.getElementById('modalImg').src = imgUrl;
+    document.getElementById('modalLink').href = song.url;
+
+    const modal = new bootstrap.Modal(document.getElementById('songModal'));
+    modal.show();
+}
+
 
 // Initial render
 renderSongs();
