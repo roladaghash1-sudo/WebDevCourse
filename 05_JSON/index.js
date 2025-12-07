@@ -1,13 +1,14 @@
+
 let userObj =
 {
-    username: "rola",
+    username: "Rola",
     grade: 85,
-    password: "pase123",
+    password: "pass123",
     isConnected: true,
     address: {
         country: "israel",
-        city: "tel aviv",
-        street: "dizengoff"
+        city: "KASH",
+        street: "ben guriuon 10"
     },
     allgrades: [{ csharp: 90 }, { cpp: 70 }, 90, 100, 85]
 }
@@ -21,12 +22,29 @@ userObj.grade += 10;
 userObj2.grade = 0;
 let grade1 = userObj.grade;
 
+
 userObj.address.street = "";
-userObj["address"].city = "jerusalem";
+userObj["address"].city = "telaviv";
 
-let arr = [userObj, { csharp: 90 }, { cpp: 70 }, 90, 100, 85]
 
-arr[0].addressllgrades[1] = { CPP: 80 };
+let arr = [userObj, {
+    username: "gshor",
+    grade: 85,
+    password: "pass123",
+    isConnected: true,
+    address: {
+        country: "israel",
+        city: "KASH",
+        street: "ben guriuon 10"
+    },
+    allgrades: [{ csharp: 90 }, { cpp: 70 }, 90, 100, 85]
+}
+]
+
+arr[0].allgrades[1] = { CPP: 80 };
 arr[1].avg = 95;
+
 let user2 = arr[1];
 user2.password = "12345";
+
+

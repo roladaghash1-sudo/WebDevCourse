@@ -14,6 +14,8 @@ form.addEventListener('submit', (e) => {
     //Read Forms Data
     const title = document.getElementById('title').value;
     const url = document.getElementById('url').value;
+    const rating = Number(document.getElementById('rating').value); //3
+
 
     //TODO validate fields
 
@@ -22,6 +24,7 @@ form.addEventListener('submit', (e) => {
         id: Date.now(),  // Unique ID
         title: title,
         url: url,
+        rating: rating,
         dateAdded: Date.now()
     };
 
@@ -53,6 +56,7 @@ function renderSongs() {
 
         row.innerHTML = `
             <td>${song.title}</td>
+            <td>${song.rating}<td>
             <td><a href="${song.url}" target="_blank" class="text-info">Watch</a></td>
             <td class="text-end">
                 <button class="btn btn-sm btn-warning me-2" onclick="editSong(${song.id})">
@@ -69,7 +73,7 @@ function renderSongs() {
 
 
 function saveAndRender() {
-    localStorage.setItem('playlist', JSON.stringify(songs));
+    localStorage.setItem('songs', JSON.stringify(songs));
     renderSongs(songs);
 }
 
@@ -81,3 +85,4 @@ function deleteSong(id) {
     }
 }
 
+renderSongs();
