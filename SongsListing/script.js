@@ -81,7 +81,7 @@ function renderSongs() {
     });
 }
 
-// Delete song
+//5. Delete song
 function deleteSong(id) {
     if (confirm('Are you sure?')) {
         songs = songs.filter(song => song.id !== id);
