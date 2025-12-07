@@ -120,5 +120,42 @@ function getYouTubeId(url) {
     return match ? match[1] : null;
 }
 
+//7
+function applySorting() {
+    const sortValue = document.getElementById('sort').value;
+
+    switch (sortValue) {
+
+        case "newest":
+            songs.sort((a, b) => b.dateAdded - a.dateAdded);
+            break;
+
+        case "oldest":
+            songs.sort((a, b) => a.dateAdded - b.dateAdded);
+            break;
+
+        case "az":
+            songs.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+
+        case "za":
+            songs.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+
+        case "ratingLow":
+            songs.sort((a, b) => a.rating - b.rating);
+            break;
+
+        case "ratingHigh":
+            songs.sort((a, b) => b.rating - a.rating);
+            break;
+    }
+}
+
+document.getElementById('sort').addEventListener('change', () => {
+    applySorting();
+    renderSongs();
+});
+
 // Initial render
 renderSongs();
