@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f6f7fb;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+        }
+
+        h1 {
+            margin: 0 0 14px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button,
+        a.btn {
+            border: 1px solid #ddd;
+            background: #fafafa;
+            color: #111;
+            cursor: pointer;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        button.primary {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .error {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff0f0;
+            border: 1px solid #ffd1d1;
+            color: #a00000;
+            line-height: 1.6;
+        }
+
+        .hint {
+            color: #666;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Login</h1>
+
+            <div id="errorBox" class="error"></div>
+
+            <form id="loginForm" novalidate>
+                <div>
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text" autocomplete="username" />
+                </div>
+
+                <div>
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" />
+                </div>
+
+                <div class="actions">
+                    <button class="primary" type="submit">Login</button>
+                    <a class="btn" href="./register.html">Create Account</a>
+                    <a class="btn" href="./index.html">Back to Home</a>
+                </div>
+
+                <div class="hint">
+                    Tip: Register first, then login using the same username and password.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // Login Page Logic
+        // Requirements covered:
+        // 1) Validate username+password against localStorage users
+        // 2) On success: store currentUser in sessionStorage and redirect to search.html
+        // ============================================================
+
+        const USERS_KEY = "users";
+        const CURRENT_USER_KEY = "currentUser";
+
+        function getUsers() {
+            const raw = localStorage.getItem(USERS_KEY);
+            if (!raw) return [];
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function showError(message) {
+            const box = document.getElementById("errorBox");
+            box.textContent = message;
+            box.style.display = "block";
+        }
+
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        // If already logged in (optional convenience), go directly to search.html
+        // Comment this out if your teacher does NOT want auto-redirect.
+        (function autoRedirectIfLoggedIn() {
+            const current = sessionStorage.getItem(CURRENT_USER_KEY);
+            if (current) {
+                window.location.href = "./search.html";
+            }
+        })();
+
+        document.getElementById("loginForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            clearError();
+
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!username || !password) {
+                showError("Please enter both username and password.");
+                return;
+            }
+
+            const users = getUsers();
+
+            // Find matching user (case-insensitive username)
+            const user = users.find(u =>
+                (u.username || "").toLowerCase() === username.toLowerCase() &&
+                (u.password || "") === password
+            );
+
+            if (!user) {
+                showError("Invalid username or password.");
+                return;
+            }
+
+            // ✅ Success: store currentUser in SESSION storage
+            sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+
+            // Redirect to search page
+            window.location.href = "./search.html";
+        });
+    </script>
+</body>
+
+</html>

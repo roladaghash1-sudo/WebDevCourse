@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playlists</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f6f7fb;
+            color: #111;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-weight: 800;
+        }
+
+        .userBox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .userBox img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .welcome {
+            font-weight: 700;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 18px auto;
+            padding: 0 18px 30px;
+        }
+
+        /* Layout: Sidebar + Main */
+        .layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .06);
+        }
+
+        /* Sidebar */
+        .sidebarHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sidebarTitle {
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .btnPrimary {
+            border: 1px solid #111;
+            background: #111;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .playlistList {
+            display: grid;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .plItem {
+            border: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: grid;
+            gap: 4px;
+        }
+
+        .plItem:hover {
+            background: #f3f3f3;
+        }
+
+        .plItem.active {
+            border-color: #111;
+            background: #fff;
+        }
+
+        .plName {
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .plMeta {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Main */
+        .mainTop {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .mainTitle {
+            font-weight: 900;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .controlsRow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin: 12px 0 6px;
+        }
+
+        input[type="text"] {
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            min-width: 240px;
+            flex: 1;
+        }
+
+        select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+            min-width: 160px;
+        }
+
+        .hint {
+            color: #666;
+            font-size: 13px;
+            margin: 8px 0 0;
+        }
+
+        .emptyState {
+            color: #444;
+            font-size: 14px;
+            padding: 12px;
+            border: 1px dashed #ccc;
+            border-radius: 12px;
+            background: #fafafa;
+        }
+
+        /* Songs grid */
+        .songsGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 980px) {
+            .songsGrid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .songCard {
+            border: 1px solid #eee;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 0;
+        }
+
+        @media (max-width: 520px) {
+            .songCard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .songThumb img {
+            width: 160px;
+            height: 110px;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 520px) {
+            .songThumb img {
+                width: 100%;
+                height: 180px;
+            }
+        }
+
+        .songBody {
+            padding: 12px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .songTitle {
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .songMeta {
+            color: #555;
+            font-size: 13px;
+            display: grid;
+            gap: 2px;
+        }
+
+        .btnRow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            align-items: center;
+        }
+
+        .btn {
+            border: 1px solid #ddd;
+            background: #fafafa;
+            color: #111;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btnDanger {
+            border: 1px solid #a00000;
+            background: #fff;
+            color: #a00000;
+        }
+
+        /* rating ui */
+        .ratingRow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ratingLabel {
+            font-size: 13px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .ratingStars {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .ratingSelect {
+            min-width: 120px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        /* Modal (New Playlist) */
+        #newPlaylistModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modalBox {
+            max-width: 520px;
+            margin: 80px auto;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .modalHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modalTitle {
+            font-weight: 900;
+        }
+
+        .modalBody {
+            padding: 14px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .modalActions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 12px 14px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            background: #111;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            display: none;
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand">Music App</div>
+        <div class="userBox">
+            <img id="userImg" src="https://via.placeholder.com/42" alt="User" />
+            <div class="welcome" id="welcomeMsg">Welcome</div>
+        </div>
+    </header>
+
+    <div class="page">
+        <div class="layout">
+            <!-- Sidebar -->
+            <aside class="card">
+                <div class="sidebarHeader">
+                    <div class="sidebarTitle">My Library</div>
+                    <button id="newPlaylistBtn" class="btnPrimary" type="button">+ New Playlist</button>
+                </div>
+
+                <div class="hint">Your playlists:</div>
+                <div id="playlistList" class="playlistList"></div>
+
+                <div style="margin-top:14px;">
+                    <button id="playPlaylistBtn" class="btnPrimary" type="button" disabled style="width:100%;">
+                        ▶ Play Playlist
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main -->
+            <main class="card">
+                <div class="mainTop">
+                    <h1 class="mainTitle" id="mainTitle">Playlists</h1>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button id="deletePlaylistBtn" class="btn btnDanger" type="button" disabled>
+                            Delete Playlist
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chooseMsg" class="emptyState">
+                    Choose a playlist from the list.
+                </div>
+
+                <div id="mainControls" style="display:none;">
+                    <div class="controlsRow">
+                        <input id="songSearchInput" type="text" placeholder="Search songs in this playlist..." />
+                        <select id="sortSelect">
+                            <option value="az">Sort: A-Z</option>
+                            <option value="newest">Sort: Newest</option>
+                            <option value="ratingHigh">Sort: Rating (High → Low)</option>
+                            <option value="ratingLow">Sort: Rating (Low → High)</option>
+                        </select>
+                    </div>
+
+                    <div class="hint" id="songsCountHint"></div>
+                    <div id="songsGrid" class="songsGrid"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- New Playlist Modal -->
+    <div id="newPlaylistModal">
+        <div class="modalBox">
+            <div class="modalHeader">
+                <div class="modalTitle">Create New Playlist</div>
+                <button id="closeNewPlaylistModalBtn" class="btn" type="button">Close</button>
+            </div>
+            <div class="modalBody">
+                <input id="newPlaylistNameInput" type="text" placeholder="Playlist name..." />
+                <div class="hint">Tip: name must be unique.</div>
+            </div>
+            <div class="modalActions">
+                <button id="createPlaylistBtn" class="btnPrimary" type="button">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // ============================================================
+        // Storage keys (match your app)
+        const USERS_KEY = "users";
+        const CURRENT_USER_KEY = "currentUser";
+
+        // ============================================================
+        // Helpers: storage
+        function getCurrentUser() {
+            const raw = sessionStorage.getItem(CURRENT_USER_KEY);
+            if (!raw) return null;
+            try { return JSON.parse(raw); } catch { return null; }
+        }
+
+        function setCurrentUser(userObj) {
+            sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
+        }
+
+        function getUsers() {
+            const raw = localStorage.getItem(USERS_KEY);
+            if (!raw) return [];
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function findUserIndex(users, username) {
+            return users.findIndex(u => (u.username || "").toLowerCase() === (username || "").toLowerCase());
+        }
+
+        // ============================================================
+        // Auth guard + header
+        let currentUser = getCurrentUser();
+        if (!currentUser) {
+            window.location.href = "./login.html";
+        } else {
+            document.getElementById("welcomeMsg").textContent = `Hello ${currentUser.username}`;
+            document.getElementById("userImg").src = currentUser.imageUrl || "https://via.placeholder.com/42";
+        }
+
+        // ============================================================
+        // Utils
+        function uid() {
+            return "pl_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        }
+
+        function clampRating(x) {
+            const n = Number(x);
+            if (!Number.isFinite(n)) return 0;
+            return Math.max(0, Math.min(5, Math.floor(n)));
+        }
+
+        function stars(n) {
+            const r = clampRating(n);
+            return "⭐".repeat(r) + (r === 0 ? "—" : "");
+        }
+
+        // ============================================================
+        // Migration + normalize playlists
+        // Supports legacy structures:
+        // playlists[].items[] OR playlists[].videos[] -> playlists[].songs[]
+        function ensureUserPlaylists(user) {
+            user.playlists = Array.isArray(user.playlists) ? user.playlists : [];
+            user.favorites = Array.isArray(user.favorites) ? user.favorites : [];
+
+            user.playlists.forEach(pl => {
+                if (!pl.id) pl.id = uid();
+                if (!Array.isArray(pl.songs)) pl.songs = [];
+
+                // merge legacy every time (not only when songs is empty)
+                const legacy = [
+                    ...(Array.isArray(pl.videos) ? pl.videos : []),
+                    ...(Array.isArray(pl.items) ? pl.items : [])
+                ];
+
+                legacy.forEach(v => {
+                    const vid = v?.videoId;
+                    if (!vid) return;
+                    const exists = pl.songs.some(s => s.videoId === vid);
+                    if (!exists) pl.songs.push({ ...v, addedAt: v.addedAt || Date.now() });
+                });
+
+                // ensure fields exist for sorting/rating
+                pl.songs = pl.songs.map(s => ({
+                    ...s,
+                    addedAt: s.addedAt || Date.now(),
+                    rating: clampRating(s.rating ?? 0),
+                }));
+
+                delete pl.videos;
+                delete pl.items;
+            });
+
+            return user;
+        }
+
+        // ============================================================
+        // Toast
+        let toastTimer = null;
+        function showToast(msg, ms = 1400) {
+            const el = document.getElementById("toast");
+            el.textContent = msg;
+            el.style.display = "block";
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                el.style.display = "none";
+            }, ms);
+        }
+
+        // ============================================================
+        // QueryString: supports ?pid=<playlistId> OR ?name=<playlistName>
+        function setPlaylistQuery(pid) {
+            const url = new URL(window.location.href);
+            if (pid) {
+                url.searchParams.set("pid", pid);
+                url.searchParams.delete("name");
+            } else {
+                url.searchParams.delete("pid");
+            }
+            window.history.pushState({}, "", url.toString());
+        }
+
+        function getPlaylistQuery() {
+            const url = new URL(window.location.href);
+            const pid = url.searchParams.get("pid") || "";
+            const name = url.searchParams.get("name") || "";
+            return { pid, name };
+        }
+
+        // ============================================================
+        // UI refs
+        const playlistListEl = document.getElementById("playlistList");
+
+        const mainTitleEl = document.getElementById("mainTitle");
+        const chooseMsgEl = document.getElementById("chooseMsg");
+        const mainControlsEl = document.getElementById("mainControls");
+
+        const playPlaylistBtn = document.getElementById("playPlaylistBtn");
+        const deletePlaylistBtn = document.getElementById("deletePlaylistBtn");
+
+        const songSearchInput = document.getElementById("songSearchInput");
+        const sortSelect = document.getElementById("sortSelect");
+        const songsGridEl = document.getElementById("songsGrid");
+        const songsCountHint = document.getElementById("songsCountHint");
+
+        // New playlist modal
+        const newPlaylistModal = document.getElementById("newPlaylistModal");
+        const newPlaylistBtn = document.getElementById("newPlaylistBtn");
+        const closeNewPlaylistModalBtn = document.getElementById("closeNewPlaylistModalBtn");
+        const createPlaylistBtn = document.getElementById("createPlaylistBtn");
+        const newPlaylistNameInput = document.getElementById("newPlaylistNameInput");
+
+        // ============================================================
+        // Load user fresh from localStorage each time (and SAVE migration back)
+        function loadFreshUser() {
+            const users = getUsers();
+            const idx = findUserIndex(users, currentUser.username);
+            if (idx === -1) return null;
+
+            const u = ensureUserPlaylists(users[idx]);
+
+            // IMPORTANT: persist migrated structure
+            users[idx] = u;
+            saveUsers(users);
+
+            currentUser = u;
+            setCurrentUser(currentUser);
+
+            return { users, idx, user: u };
+        }
+
+        // ============================================================
+        // Render sidebar playlists
+        let selectedPlaylistId = "";
+
+        function renderSidebar(playlists) {
+            playlistListEl.innerHTML = "";
+
+            if (!playlists || playlists.length === 0) {
+                const div = document.createElement("div");
+                div.className = "emptyState";
+                div.textContent = "No playlists yet. Click “+ New Playlist”.";
+                playlistListEl.appendChild(div);
+                return;
+            }
+
+            playlists.forEach(pl => {
+                const item = document.createElement("div");
+                item.className = "plItem" + (pl.id === selectedPlaylistId ? " active" : "");
+
+                const name = document.createElement("div");
+                name.className = "plName";
+                name.textContent = pl.name;
+
+                const meta = document.createElement("div");
+                meta.className = "plMeta";
+                const count = Array.isArray(pl.songs) ? pl.songs.length : 0;
+                meta.textContent = `${count} song${count === 1 ? "" : "s"}`;
+
+                item.appendChild(name);
+                item.appendChild(meta);
+
+                item.addEventListener("click", () => {
+                    selectPlaylist(pl.id);
+                });
+
+                playlistListEl.appendChild(item);
+            });
+        }
+
+        // ============================================================
+        // Save rating (per song inside playlist)
+        function updateSongRating(pid, videoId, rating) {
+            const r = clampRating(rating);
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const user = pack.user;
+            const pl = user.playlists.find(p => p.id === pid);
+            if (!pl) return;
+
+            pl.songs = Array.isArray(pl.songs) ? pl.songs : [];
+            const song = pl.songs.find(s => s.videoId === videoId);
+            if (!song) return;
+
+            song.rating = r;
+
+            pack.users[pack.idx] = user;
+            saveUsers(pack.users);
+
+            currentUser = user;
+            setCurrentUser(currentUser);
+
+            showToast(`Saved rating: ${r}/5`);
+            refreshUI(); // re-render + apply sort if needed
+        }
+
+        // ============================================================
+        // Render main playlist songs
+        function renderMain(playlist) {
+            if (!playlist) {
+                mainTitleEl.textContent = "Playlists";
+                chooseMsgEl.style.display = "block";
+                mainControlsEl.style.display = "none";
+                playPlaylistBtn.disabled = true;
+                deletePlaylistBtn.disabled = true;
+                songsGridEl.innerHTML = "";
+                songsCountHint.textContent = "";
+                return;
+            }
+
+            mainTitleEl.textContent = playlist.name;
+            chooseMsgEl.style.display = "none";
+            mainControlsEl.style.display = "block";
+            playPlaylistBtn.disabled = false;
+            deletePlaylistBtn.disabled = false;
+
+            const songs = Array.isArray(playlist.songs) ? playlist.songs.slice() : [];
+
+            // filter
+            const term = (songSearchInput.value || "").trim().toLowerCase();
+            let filtered = term
+                ? songs.filter(s => (s.title || "").toLowerCase().includes(term))
+                : songs;
+
+            // sort
+            const sortMode = sortSelect.value;
+
+            if (sortMode === "az") {
+                filtered.sort((a, b) =>
+                    (a.title || "").localeCompare((b.title || ""), undefined, { sensitivity: "base" })
+                );
+            } else if (sortMode === "newest") {
+                filtered.sort((a, b) => Number(b.addedAt || 0) - Number(a.addedAt || 0));
+            } else if (sortMode === "ratingHigh") {
+                filtered.sort((a, b) => clampRating(b.rating) - clampRating(a.rating));
+            } else if (sortMode === "ratingLow") {
+                filtered.sort((a, b) => clampRating(a.rating) - clampRating(b.rating));
+            }
+
+            songsCountHint.textContent = `Showing ${filtered.length} of ${songs.length} songs`;
+
+            songsGridEl.innerHTML = "";
+            if (filtered.length === 0) {
+                const div = document.createElement("div");
+                div.className = "emptyState";
+                div.textContent = term ? "No matching songs." : "This playlist is empty.";
+                songsGridEl.appendChild(div);
+                return;
+            }
+
+            filtered.forEach(song => {
+                const card = document.createElement("div");
+                card.className = "songCard";
+
+                const thumb = document.createElement("div");
+                thumb.className = "songThumb";
+                const img = document.createElement("img");
+                img.src = song.thumbnailUrl || "https://via.placeholder.com/480x360";
+                img.alt = song.title || "thumbnail";
+                thumb.appendChild(img);
+
+                const body = document.createElement("div");
+                body.className = "songBody";
+
+                const title = document.createElement("div");
+                title.className = "songTitle";
+                title.textContent = song.title || "Untitled";
+
+                const meta = document.createElement("div");
+                meta.className = "songMeta";
+                meta.innerHTML = `
+          <div><b>Channel:</b> ${song.channelTitle || "N/A"}</div>
+          <div><b>Video ID:</b> ${song.videoId || ""}</div>
+        `;
+
+                // rating UI
+                const ratingRow = document.createElement("div");
+                ratingRow.className = "ratingRow";
+
+                const ratingLabel = document.createElement("div");
+                ratingLabel.className = "ratingLabel";
+                ratingLabel.textContent = "Rating:";
+
+                const ratingStars = document.createElement("div");
+                ratingStars.className = "ratingStars";
+                ratingStars.textContent = stars(song.rating);
+
+                const ratingSelect = document.createElement("select");
+                ratingSelect.className = "ratingSelect";
+                ratingSelect.innerHTML = `
+          <option value="0">No rating</option>
+          <option value="1">1 ⭐</option>
+          <option value="2">2 ⭐⭐</option>
+          <option value="3">3 ⭐⭐⭐</option>
+          <option value="4">4 ⭐⭐⭐⭐</option>
+          <option value="5">5 ⭐⭐⭐⭐⭐</option>
+        `;
+                ratingSelect.value = String(clampRating(song.rating));
+
+                ratingSelect.addEventListener("change", () => {
+                    updateSongRating(selectedPlaylistId, song.videoId, ratingSelect.value);
+                });
+
+                ratingRow.appendChild(ratingLabel);
+                ratingRow.appendChild(ratingSelect);
+                ratingRow.appendChild(ratingStars);
+
+                const btnRow = document.createElement("div");
+                btnRow.className = "btnRow";
+
+                const openBtn = document.createElement("button");
+                openBtn.className = "btn";
+                openBtn.textContent = "Open on YouTube";
+                openBtn.addEventListener("click", () => {
+                    window.open(`https://www.youtube.com/watch?v=${song.videoId}`, "_blank", "noopener");
+                });
+
+                const delBtn = document.createElement("button");
+                delBtn.className = "btn btnDanger";
+                delBtn.textContent = "Remove Song";
+                delBtn.addEventListener("click", () => {
+                    removeSongFromPlaylist(selectedPlaylistId, song.videoId);
+                });
+
+                btnRow.appendChild(openBtn);
+                btnRow.appendChild(delBtn);
+
+                body.appendChild(title);
+                body.appendChild(meta);
+                body.appendChild(ratingRow);
+                body.appendChild(btnRow);
+
+                card.appendChild(thumb);
+                card.appendChild(body);
+
+                songsGridEl.appendChild(card);
+            });
+        }
+
+        // ============================================================
+        // Select playlist
+        function selectPlaylist(pid) {
+            selectedPlaylistId = pid || "";
+            setPlaylistQuery(selectedPlaylistId);
+            refreshUI();
+        }
+
+        function refreshUI() {
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const playlists = pack.user.playlists;
+
+            // handle URL selection: pid OR name
+            const q = getPlaylistQuery();
+
+            if (q.pid && q.pid !== selectedPlaylistId) {
+                selectedPlaylistId = q.pid;
+            }
+
+            if (!selectedPlaylistId && q.name) {
+                const byName = playlists.find(p => (p.name || "").toLowerCase() === q.name.toLowerCase());
+                if (byName) {
+                    selectedPlaylistId = byName.id;
+                    setPlaylistQuery(selectedPlaylistId);
+                }
+            }
+
+            renderSidebar(playlists);
+
+            const playlist = playlists.find(p => p.id === selectedPlaylistId);
+            renderMain(playlist || null);
+        }
+
+        // ============================================================
+        // Create playlist
+        function openNewPlaylistModal() {
+            newPlaylistNameInput.value = "";
+            newPlaylistModal.style.display = "block";
+            setTimeout(() => newPlaylistNameInput.focus(), 10);
+        }
+
+        function closeNewPlaylistModal() {
+            newPlaylistModal.style.display = "none";
+        }
+
+        function createPlaylist(name) {
+            const trimmed = (name || "").trim();
+            if (!trimmed) {
+                alert("Please enter a playlist name.");
+                return;
+            }
+
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const user = pack.user;
+
+            const exists = user.playlists.some(p => (p.name || "").toLowerCase() === trimmed.toLowerCase());
+            if (exists) {
+                alert("A playlist with this name already exists.");
+                return;
+            }
+
+            const newPl = {
+                id: uid(),
+                name: trimmed,
+                createdAt: Date.now(),
+                songs: []
+            };
+
+            user.playlists.push(newPl);
+
+            pack.users[pack.idx] = user;
+            saveUsers(pack.users);
+
+            currentUser = user;
+            setCurrentUser(currentUser);
+
+            closeNewPlaylistModal();
+            showToast("Playlist created");
+
+            selectPlaylist(newPl.id);
+        }
+
+        // ============================================================
+        // Remove song
+        function removeSongFromPlaylist(pid, videoId) {
+            if (!pid || !videoId) return;
+
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const user = pack.user;
+            const pl = user.playlists.find(p => p.id === pid);
+            if (!pl) return;
+
+            pl.songs = Array.isArray(pl.songs) ? pl.songs : [];
+            const before = pl.songs.length;
+            pl.songs = pl.songs.filter(s => s.videoId !== videoId);
+
+            if (pl.songs.length === before) return;
+
+            pack.users[pack.idx] = user;
+            saveUsers(pack.users);
+
+            currentUser = user;
+            setCurrentUser(currentUser);
+
+            showToast("Removed");
+            refreshUI();
+        }
+
+        // ============================================================
+        // Delete playlist
+        function deleteSelectedPlaylist() {
+            if (!selectedPlaylistId) return;
+
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const user = pack.user;
+            const pl = user.playlists.find(p => p.id === selectedPlaylistId);
+            if (!pl) return;
+
+            const ok = confirm(`Delete playlist "${pl.name}"? This cannot be undone.`);
+            if (!ok) return;
+
+            user.playlists = user.playlists.filter(p => p.id !== selectedPlaylistId);
+
+            pack.users[pack.idx] = user;
+            saveUsers(pack.users);
+
+            currentUser = user;
+            setCurrentUser(currentUser);
+
+            showToast("Playlist deleted");
+
+            selectedPlaylistId = "";
+            setPlaylistQuery("");
+            refreshUI();
+        }
+        // ============================================================
+        // Play playlist (open first song)
+        function playSelectedPlaylist() {
+            const pack = loadFreshUser();
+            if (!pack) return;
+
+            const pl = pack.user.playlists.find(p => p.id === selectedPlaylistId);
+            if (!pl || !Array.isArray(pl.songs) || pl.songs.length === 0) {
+                showToast("This playlist is empty.");
+                return;
+            }
+
+            const first = pl.songs[0];
+            window.open(`https://www.youtube.com/watch?v=${first.videoId}`, "_blank", "noopener");
+        }
+
+
+        // ============================================================
+        // Events
+        newPlaylistBtn.addEventListener("click", openNewPlaylistModal);
+        closeNewPlaylistModalBtn.addEventListener("click", closeNewPlaylistModal);
+        newPlaylistModal.addEventListener("click", (e) => {
+            if (e.target === newPlaylistModal) closeNewPlaylistModal();
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && newPlaylistModal.style.display === "block") closeNewPlaylistModal();
+        });
+
+        createPlaylistBtn.addEventListener("click", () => createPlaylist(newPlaylistNameInput.value));
+        newPlaylistNameInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") createPlaylistBtn.click();
+        });
+
+        songSearchInput.addEventListener("input", refreshUI);
+        sortSelect.addEventListener("change", refreshUI);
+
+        deletePlaylistBtn.addEventListener("click", deleteSelectedPlaylist);
+        playPlaylistBtn.addEventListener("click", playSelectedPlaylist);
+
+        // ============================================================
+        // Init
+        refreshUI();
+    </script>
+</body>
+
+</html>

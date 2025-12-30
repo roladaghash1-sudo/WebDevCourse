@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f6f7fb;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+        }
+
+        h1 {
+            margin: 0 0 14px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .row {
+            display: grid;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button,
+        a.btn {
+            border: 1px solid #ddd;
+            background: #fafafa;
+            color: #111;
+            cursor: pointer;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        button.primary {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .error {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff0f0;
+            border: 1px solid #ffd1d1;
+            color: #a00000;
+            line-height: 1.6;
+        }
+
+        .preview {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .preview img {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .hint {
+            color: #666;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Create Account</h1>
+
+            <div id="errorBox" class="error"></div>
+
+            <form id="registerForm" novalidate>
+                <div class="row">
+                    <div>
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text" autocomplete="username" />
+                    </div>
+
+                    <div>
+                        <label for="firstName">First Name</label>
+                        <input id="firstName" name="firstName" type="text" autocomplete="given-name" />
+                    </div>
+
+                    <div>
+                        <label for="imageUrl">Profile Image (URL)</label>
+                        <input id="imageUrl" name="imageUrl" type="url" placeholder="https://..." />
+                        <div class="hint">Paste a direct image URL (example: https://...png)</div>
+
+                        <div class="preview">
+                            <img id="imgPreview" alt="Preview" src="https://via.placeholder.com/108" />
+                            <span class="hint">Preview</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" autocomplete="new-password" />
+                        <div class="hint">At least 6 characters, must include at least one letter and one number.</div>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password"
+                            autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="primary" type="submit">Register</button>
+                    <a class="btn" href="./login.html">Already have an account? Login</a>
+                    <a class="btn" href="./index.html">Back to Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // Register Page Logic
+        // Requirements covered:
+        // 1) Required fields
+        // 2) Username uniqueness in localStorage ("users")
+        // 3) Password rules: minimum 6 chars, must contain a letter and a digit
+        // 4) Confirm password must match
+        // 5) On success: save user and redirect to login.html
+        // ============================================================
+
+        // LocalStorage key
+        const USERS_KEY = "users";
+
+        // Read users array from localStorage
+        function getUsers() {
+            const raw = localStorage.getItem(USERS_KEY);
+            if (!raw) return [];
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        // Save users array to localStorage
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        // Show an error message
+        function showError(message) {
+            const box = document.getElementById("errorBox");
+            box.textContent = message;
+            box.style.display = "block";
+            box.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        // Clear error
+        function clearError() {
+            const box = document.getElementById("errorBox");
+            box.textContent = "";
+            box.style.display = "none";
+        }
+
+        // Validate password (min 6, has at least one letter, has at least one digit)
+        function isPasswordValid(pw) {
+            if (pw.length < 6) return false;
+            const hasLetter = /[A-Za-z]/.test(pw);
+            const hasDigit = /[0-9]/.test(pw);
+            return hasLetter && hasDigit;
+        }
+
+        // Basic URL validation (enough for this assignment)
+        function isValidUrl(str) {
+            try {
+                new URL(str);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        // Image preview
+        const imageUrlInput = document.getElementById("imageUrl");
+        const imgPreview = document.getElementById("imgPreview");
+
+        imageUrlInput.addEventListener("input", () => {
+            const url = imageUrlInput.value.trim();
+            if (url && isValidUrl(url)) {
+                imgPreview.src = url;
+            } else {
+                imgPreview.src = "https://via.placeholder.com/108";
+            }
+        });
+
+        // Handle submit
+        document.getElementById("registerForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            clearError();
+
+            const username = document.getElementById("username").value.trim();
+            const firstName = document.getElementById("firstName").value.trim();
+            const imageUrl = document.getElementById("imageUrl").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            // 1) Required fields
+            if (!username || !firstName || !imageUrl || !password || !confirmPassword) {
+                showError("All fields are required. Please fill in everything.");
+                return;
+            }
+
+            // 2) Confirm password
+            if (password !== confirmPassword) {
+                showError("Passwords do not match. Please try again.");
+                return;
+            }
+
+            // 3) Password rules
+            if (!isPasswordValid(password)) {
+                showError("Invalid password: minimum 6 characters, must include at least one letter and one number.");
+                return;
+            }
+
+            // 4) Image URL validation
+            if (!isValidUrl(imageUrl)) {
+                showError("Invalid image URL. Please provide a valid http/https URL.");
+                return;
+            }
+
+            // 5) Username uniqueness in localStorage users
+            const users = getUsers();
+            const exists = users.some(u => (u.username || "").toLowerCase() === username.toLowerCase());
+            if (exists) {
+                showError("This username is already taken. Please choose another one.");
+                return;
+            }
+
+            // ✅ Success: create and store the new user
+            const newUser = {
+                username,
+                password,      // For the assignment. (In real apps, never store plaintext passwords.)
+                firstName,
+                imageUrl,
+                favorites: [],
+                playlists: []
+            };
+
+            users.push(newUser);
+            saveUsers(users);
+
+            // Redirect to login page
+            window.location.href = "./login.html";
+        });
+    </script>
+</body>
+
+</html>
