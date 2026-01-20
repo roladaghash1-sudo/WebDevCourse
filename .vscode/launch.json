@@ -7,11 +7,9 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}\\05_JSON\\practice.js"
+            "name": "Launch Edge against localhost",
+            "url": "http://localhost:http:/127.0.0.1:5500/07_API/list.html",
+            "WebRoot": "${workspaceFolder}"
         }
     ]
 }
